@@ -19,5 +19,5 @@
  the Linux X11 version :
    Linux> ./bin_gnu/<distrib>/<app>/<version>/bin/<app>
  the Windows version :
-  cygwin> ./bin_visaul/<distrib>/<app>/<version>/bin/<app>.exe
+  cygwin> ./bin_visual/<distrib>/<app>/<version>/bin/<app>.exe
 
