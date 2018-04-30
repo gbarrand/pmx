@@ -1,0 +1,13 @@
+// Copyright (C) 2010, Guy Barrand. All rights reserved.
+// See the file pmx.license for terms.
+
+#ifndef pmx_pmx_version
+#define pmx_pmx_version
+
+#define PMX_MAJOR_VERSION 1
+#define PMX_MINOR_VERSION 2
+#define PMX_PATCH_VERSION 1
+#define PMX_VERSION "1.2.1"
+#define PMX_VERSION_VRP "v1r2p1"
+
+#endif

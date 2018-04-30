@@ -1,0 +1,665 @@
+// Copyright (C) 2010, Guy Barrand. All rights reserved.
+// See the file pmx.license for terms.
+
+#ifndef pmx_pmx_LHCb
+#define pmx_pmx_LHCb
+
+#include <inlib/vec3d>
+#include <inlib/scast>
+#include <inlib/vmanip>
+#include <inlib/cid>
+
+#include <inlib/rroot/buffer>
+
+namespace pmx {
+
+inline inlib::cid LHCb_State_cid()    {return 0;}
+inline inlib::cid LHCb_Track_cid()    {return 1;}
+inline inlib::cid KC_LHCb_Track_cid() {return 2;}
+
+/* 
+StreamerInfos got from the file : 00001634_00000512_5.dst
+
+//////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+StreamerInfo for class: KeyedContainer<LHCb::Track,Containers::KeyedObjectManager<Containers::hashmap> >, version=1, checksum=0xafeb471a
+  ObjectContainerBase BASE            offset=  0 type= 0                     
+  vector<LHCb::Track*> m_sequential    offset=  0 type=300 ,stl=1, ctype=63,
+
+StreamerInfo for class: ObjectContainerBase, version=1, checksum=0x4cf975d8
+  DataObject     BASE            offset=  0 type= 0                     
+
+StreamerInfo for class: DataObject, version=1, checksum=0x238fd9
+  
+//////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+StreamerInfo for class: LHCb::Track, version=1, checksum=0xb289ea4f
+  KeyedObject<int> BASE          offset=  0 type= 0                     
+  double         m_chi2PerDoF    offset=  0 type= 8                     
+  int            m_nDoF          offset=  0 type= 3                     
+  unsigned int   m_flags         offset=  0 type=13                     
+  vector<LHCb::LHCbID> m_lhcbIDs offset=  0 type=300 ,stl=1, ctype=61,
+  vector<LHCb::State*> m_states  offset=  0 type=300 ,stl=1, ctype=63,
+  GaudiUtils::VectorMap<int,double,less<const int>,allocator<pair<int,double> > > m_extraInfo     offset=  0 type=62                     
+  SmartRefVector<LHCb::Track> m_ancestors     offset=  0 type=62                     
+StreamerInfo for class: KeyedObject<int>, version=1, checksum=0x159f86fe
+  ContainedObject BASE           offset=  0 type= 0                     
+  int            m_key           offset=  0 type= 3                     
+
+StreamerInfo for class: ContainedObject, version=1, checksum=0x22e2a0b6
+
+//////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+StreamerInfo for class: LHCb::LHCbID, version=1, checksum=0xb0679955
+  unsigned int   m_lhcbID        offset=  0 type=13                     
+
+//////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+StreamerInfo for class: LHCb::State, version=1, checksum=0x6663e042
+  unsigned int   m_flags                        offset=  0 type=13
+  ROOT::Math::SVector<double,5> m_stateVector   offset=  0 type=62
+  ROOT::Math::SMatrix<double,5,5,ROOT::Math::MatRepSym<double,5> > m_covariance    offset=  0 type=62
+  double         m_z                            offset=  0 type= 8
+
+StreamerInfo for class: ROOT::Math::SVector<double,5>, version=1, checksum=0x40622719
+  double         fArray[5]                      offset=  0 type=28
+
+StreamerInfo for class: ROOT::Math::SMatrix<double,5,5,ROOT::Math::MatRepSym<double,5> >, version=1, checksum=0xd00791c2
+  ROOT::Math::MatRepSym<double,5> fRep          offset=  0 type=62
+
+StreamerInfo for class: ROOT::Math::MatRepSym<double,5>, version=1, checksum=0x56682d4f
+  double         fArray[15]                     offset=  0 type=28
+
+*/
+//////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+
+  /*
+inline bool ContainedObject_stream(inlib::rroot::buffer& a_buffer) {
+  short v;
+  if(!a_buffer.read_version(v)) return false;
+  //::printf("debug : ContainedObject_stream : v %d\n",v);
+  return true;
+}
+
+inline bool KeyedObject_int_stream(inlib::rroot::buffer& a_buffer) {
+  //inlib::uint32 startpos = a_buffer.length();
+  short v;
+  unsigned int s,c;
+  if(!a_buffer.read_version(v,s,c)) return false; 
+  //::printf("debug : KeyedObject_int_stream : v %d s %d c %d pos %d,%d\n",
+  //	   v,s,c,startpos,a_buffer.length());
+  if(!ContainedObject_stream(a_buffer)) return false;
+
+  int m_key;
+  if(!a_buffer.read(m_key)) return false;
+
+  //a_buffer.set_offset(startpos+c+sizeof(unsigned int));
+  if(!a_buffer.check_byte_count(s,c,"KeyedObject<int>")) return false;
+  return true;
+}
+  */
+
+
+class LHCb_State : public virtual inlib::rroot::iro {
+public:
+  static const std::string& s_class() {
+    static const std::string s_v("pmx::LHCb_State");
+    return s_v;
+  }
+  static const std::string& s_store_class() {
+    static const std::string s_v("LHCb::State");
+    return s_v;
+  }
+public: //iro
+  virtual void* cast(const std::string& a_class) const {
+    if(void* p = inlib::cmp_cast<LHCb_State>(this,a_class)) {return p;}
+    else return 0;
+  }
+  virtual const std::string& s_cls() const {return s_class();}
+  virtual inlib::rroot::iro* copy() const {return new LHCb_State(*this);}
+public:
+  static inlib::cid id_class() {return LHCb_State_cid();}
+  virtual void* cast(inlib::cid a_class) const {
+    if(void* p = inlib::cmp_cast<LHCb_State>(this,a_class)) {return p;}
+    return 0;
+  }
+public:
+  virtual bool stream(inlib::rroot::buffer& a_buffer) {
+    //inlib::uint32 startpos = a_buffer.length();
+    short v;
+    unsigned int s,c;
+    if(!a_buffer.read_version(v,s,c)) return false;
+    //FIXME : version should be 1 !
+    //::printf("debug : State : version %d %d\n",v,a_buffer.length()-startpos);
+
+    a_buffer.skip(4); //? The upper is 6 then 6+4=10.
+
+    if(!a_buffer.read(m_flags)) return false;
+
+    a_buffer.skip(10); //???
+
+    if(!a_buffer.read_fast_array<double>(m_stateVector,5)) return false;
+
+    a_buffer.skip(20); //???
+
+    if(!a_buffer.read_fast_array<double>(m_covariance,15)) return false;
+
+    if(!a_buffer.read(m_z)) return false;
+
+    //if streaming is not finished, have the below to be ok at exit.
+    //a_buffer.set_offset(startpos+c+sizeof(unsigned int));
+
+    if(!a_buffer.check_byte_count(s,c,s_store_class())) return false;
+
+    if(location()>V0Vertex) {
+      ::printf("debug : bad location %d\n",location());
+    }
+
+
+   //::printf("debug : State : m_z= %g, loc %d\n",m_z,location());
+
+   //::printf("debug : m_stateVector (%g,%g,%g,%g,%g)\n",
+   //        m_stateVector[0],m_stateVector[1],
+   //        m_stateVector[2],m_stateVector[3],m_stateVector[4]);
+
+   /*
+  {::printf("debug : m_covariance :");
+   for(unsigned int i=0;i<15;i++) {
+     if(i) ::printf(",");
+     ::printf("%g",m_covariance[i]);
+   }
+   ::printf("\n");}
+   */
+
+   /*
+   {inlib::vec3d pos = position();
+    inlib::vec3d mom = momentum();
+    ::printf("debug : State : pos (%g,%g,%g) momentum (%g,%g,%g)\n",
+	     pos[0],pos[1],pos[2],mom[0],mom[1],mom[2]);}
+   */
+
+    return true;
+  }
+public:
+  LHCb_State()
+  :m_flags(0)
+  ,m_z(0)
+  {
+#ifdef INLIB_MEM
+    inlib::mem::increment(s_class().c_str());
+#endif
+   {for(unsigned int i=0;i<5;i++) m_stateVector[i] = 0;}
+   {for(unsigned int i=0;i<15;i++) m_covariance[i] = 0;}
+  }
+  virtual ~LHCb_State(){
+#ifdef INLIB_MEM
+    inlib::mem::decrement(s_class().c_str());
+#endif
+  }
+public:
+  LHCb_State(const LHCb_State& a_from)
+  :inlib::rroot::iro(a_from)
+  ,m_flags(a_from.m_flags)
+  ,m_z(a_from.m_z)
+  {
+   {for(unsigned int i=0;i<5;i++) m_stateVector[i] = a_from.m_stateVector[i];}
+   {for(unsigned int i=0;i<15;i++) m_covariance[i] = a_from.m_covariance[i];}
+#ifdef INLIB_MEM
+    inlib::mem::increment(s_class().c_str());
+#endif
+  }
+  LHCb_State& operator=(const LHCb_State&){return *this;}
+public:
+  enum Location{   LocationUnknown,
+                   ClosestToBeam,
+                   FirstMeasurement,
+                   EndVelo,
+                   AtTT,
+                   AtT,
+                   BegRich1,
+                   EndRich1,
+                   BegRich2,
+                   EndRich2,
+                   Spd,
+                   Prs,
+                   BegECal,
+                   ECalShowerMax,
+                   MidECal,
+                   EndECal,
+                   BegHCal,
+                   MidHCal,
+                   EndHCal,
+                   Muon,
+                   LastMeasurement,
+                   Vertex,
+                   V0Vertex
+  };
+
+  Location location() const {
+    return (Location)((m_flags & locationMask) >> locationBits);
+  }
+  double x() const {return m_stateVector[0];}
+  double y() const {return m_stateVector[1];}
+  double z() const {return m_z;}
+
+  double tx() const {return m_stateVector[2];}
+  double ty() const {return m_stateVector[3];}
+  double tz() const {return 1;}
+
+  /* inefficient
+  double p() const {
+    static const double lowTolerance = 1e-20; //TrackParameters.h
+    return ( ::fabs(m_stateVector[4]) > lowTolerance ? 
+             ::fabs(1./m_stateVector[4]) : HUGE_VAL );
+  }
+  inlib::vec3d position() const {
+    return inlib::vec3d(m_stateVector[0],m_stateVector[1],m_z);        
+  }
+  inlib::vec3d slopes() const {
+    return inlib::vec3d(m_stateVector[2],m_stateVector[3],1.);        
+  }
+  inlib::vec3d momentum() const {
+    inlib::vec3d mom = slopes();
+    mom *= ( p() / mom.length() );
+    return mom;        
+  }
+  */
+
+  //pmx :
+  double S_stateVector() const {
+    double S = 0;
+    for(unsigned int i=0;i<5;i++) S += m_stateVector[i];
+    return S;
+  }
+  double S_covariance() const {
+    double S = 0;
+    for(unsigned int i=0;i<15;i++) S += m_covariance[i];
+    return S;
+  }
+private:
+  enum flagsBits{locationBits = 0};
+  enum flagsMasks{locationMask = 0xffffL};  
+private:
+  unsigned int m_flags;
+  double m_z;
+  double m_stateVector[5];
+  double m_covariance[15];
+};
+
+class LHCb_Track : public virtual inlib::rroot::iro {
+public:
+  static const std::string& s_class() {
+    static const std::string s_v("pmx::LHCb_Track");
+    return s_v;
+  }
+  static const std::string& s_store_class() {
+    static const std::string s_v("LHCb::Track");
+    return s_v;
+  }
+public: //iro
+  virtual void* cast(const std::string& a_class) const {
+    if(void* p = inlib::cmp_cast<LHCb_Track>(this,a_class)) {return p;}
+    else return 0;
+  }
+  virtual const std::string& s_cls() const {return s_class();}
+  virtual inlib::rroot::iro* copy() const {return new LHCb_Track(*this);}
+public:
+  static inlib::cid id_class() {return LHCb_Track_cid();}
+  virtual void* cast(inlib::cid a_class) const {
+    if(void* p = inlib::cmp_cast<LHCb_Track>(this,a_class)) {return p;}
+    return 0;
+  }
+public:
+  virtual bool stream(inlib::rroot::buffer& a_buffer) {
+    _clear();
+
+    inlib::uint32 startpos = a_buffer.length();
+    short v;
+    unsigned int s,c;
+    if(!a_buffer.read_version(v,s,c)) return false;
+    //FIXME : version should be 1 !
+
+    //::printf("debug : LHCb_Track::stream : v %d s %d c %d pos %d,%d\n",
+    //	     v,s,c,startpos,a_buffer.length());
+    //if(!KeyedObject_int_stream(a_buffer)) return false;
+    //::printf("debug : uuuu %d\n",(a_buffer.length()-startpos));
+
+    a_buffer.skip(24); //FIXME: why that ? 24+6=30 = 3*10 !
+
+    if(!a_buffer.read(m_key)) return false;
+
+    if(!a_buffer.read(m_chi2PerDoF)) return false;
+    if(!a_buffer.read(m_nDoF)) return false;
+    if(!a_buffer.read(m_flags)) return false;
+
+    //::printf("debug : m_chi2PerDoF %g, m_nDoF %d, m_flags %u type %d his %d\n",m_chi2PerDoF,m_nDoF,m_flags,type(),history());
+
+   {//vector<LHCb::LHCbID> m_lhcbIDs :
+    a_buffer.skip(6); //FIXME : why that ? Could be 3*short version.
+    unsigned int num;
+    if(!a_buffer.read(num)) return false;
+    //::printf("debug : m_lhcbIDs : num %d\n",num);
+    for(unsigned int i=0;i<num;i++) {
+      //LHCbID :
+      a_buffer.skip(10); //FIXME : why that ? 3*short+int ? short+2*int?
+      unsigned int id;
+      if(!a_buffer.read(id)) return false;
+      unsigned int det = detectorType(id);
+      if((det<1)||(det>7)) {
+        ::printf("debug : m_lhcbIDs   %d : id %u, det %u abnormal\n",i,id,det);
+      } else {
+        //::printf("debug : m_lhcbIDs   %d : id %u, det %u\n",i,id,det);
+      }
+    }}
+
+   {//vector<LHCb::State*> m_states :
+    a_buffer.skip(6); //FIXME : why that ? Could be 3*short version.
+    unsigned int num;
+    if(!a_buffer.read(num)) return false;
+    //::printf("debug : m_states : num %d\n",num);
+    inlib::rroot::ifac::args args;
+    for(unsigned int i=0;i<num;i++) {
+      iro* obj;
+      bool created;
+      if(!a_buffer.read_object(m_fac,args,obj,created)){
+        a_buffer.out() << "LHCb_Track::stream :"
+                       << " can't read object."
+                       << std::endl;
+        return false;
+      }
+      if(obj) {
+        LHCb_State* o = inlib::safe_cast<iro,LHCb_State>(*obj);
+        if(!o) {
+          a_buffer.out() << "LHCb_Track::stream :"
+                         << " inlib::safe_cast failed."
+                         << std::endl;
+        } else {
+          m_states.push_back(o);
+        }
+      }
+
+    }}
+
+    //streaming is not finished, have the below to be ok at exit.
+    a_buffer.set_offset(startpos+c+sizeof(unsigned int));
+
+    if(!a_buffer.check_byte_count(s,c,s_store_class())) return false;
+
+    return true;
+  }
+public:
+  LHCb_Track(inlib::rroot::ifac& a_fac)
+  :m_fac(a_fac)
+  ,m_key(0)
+  ,m_chi2PerDoF(0)
+  ,m_nDoF(0)
+  ,m_flags(0)
+  {
+#ifdef INLIB_MEM
+    inlib::mem::increment(s_class().c_str());
+#endif
+  }
+  virtual ~LHCb_Track(){
+    _clear();
+#ifdef INLIB_MEM
+    inlib::mem::decrement(s_class().c_str());
+#endif
+  }
+private:
+  LHCb_Track(const LHCb_Track& a_from)
+  :inlib::rroot::iro(a_from)
+  ,m_fac(a_from.m_fac)
+  ,m_key(a_from.m_key)
+  ,m_chi2PerDoF(a_from.m_chi2PerDoF)
+  ,m_nDoF(a_from.m_nDoF)
+  ,m_flags(a_from.m_flags)
+  {
+#ifdef INLIB_MEM
+    inlib::mem::increment(s_class().c_str());
+#endif
+  }
+  LHCb_Track& operator=(const LHCb_Track& a_from){
+    m_key = a_from.m_key;
+    m_flags = a_from.m_flags;
+    return *this;
+  }
+public:
+  int key() const {return m_key;}
+  double chi2PerDoF() const {return m_chi2PerDoF;}
+  int nDoF() const {return m_nDoF;}
+  const std::vector<LHCb_State*>& states() const {return m_states;}
+public:
+  //from LHCb_v24r0 :
+  enum flagsBits{typeBits         = 0,
+                 historyBits      = 4,
+                 fitHistoryBits   = 11,
+                 patRecStatusBits = 14,
+                 fitStatusBits    = 16,
+                 flagBits         = 18,
+                 specificBits     = 28};
+  enum flagsMasks{typeMask           = 0xfL,
+                  historyMask      = 0x7f0L,
+                  fitHistoryMask   = 0x3800L,
+                  patRecStatusMask = 0xc000L,
+                  fitStatusMask    = 0x30000L,
+                  flagMask         = 0xffc0000L,
+                  specificMask     = 0xf0000000L};
+public:
+  enum Types{ TypeUnknown = 0, // track of undefined type
+              Velo,            // VELO track
+              VeloR,           // 2D VELO track
+              Long,            // forward track
+              Upstream,        // upstream track
+              Downstream,      // downstream track
+              Ttrack,          // seed track
+              Muon,            // muon track
+              Calo             // calo cosmics track
+              //TT               // TT track
+  };
+
+  Types type() const {
+    return (Types)((m_flags & typeMask) >> typeBits);
+  }
+private:
+  enum History{HistoryUnknown = 0,
+               TrackIdealPR = 1,
+               TrackSeeding = 2,
+               PatVelo = 3,
+               PatVeloTT = 4,
+               TrackVeloTT = 5,
+               PatForward = 6,
+               TrackMatching = 7,
+               PatKShort = 8,
+               TsaTrack = 9,
+               MuonID = 10,
+               PatVeloR = 11,
+               PatVeloGeneric = 12,
+               PatVeloGeneral = 13,
+               PatVeloOpen = 14,
+               PatSeeding = 15,
+               PatMatch = 16,
+               PatDownstream = 17
+               //TTGeneric = 18,
+               //PatVeloPixCheated = 19,
+               //HLTImportedTrack = 20,
+               //PatFastVelo = 21,
+               //PatVeloPix = 22
+  };
+
+  History history() const {
+    return (History)((m_flags & historyMask) >> historyBits);
+  }
+
+  /// types of sub-detector channel ID
+  //enum channelIDType{ Velo=1,
+  //                    TT,
+  //                    IT,
+  //                    OT,
+  //                    Rich,
+  //                    Calo,
+  //                    Muon
+  //                    //VeloPix,
+  //};
+  enum lhcbIDBits{IDBits           = 0,
+                  detectorTypeBits = 28};
+  enum lhcbIDMasks{IDMask           = 0xfffffffL,
+                   detectorTypeMask = 0xf0000000L};
+  unsigned int detectorType(unsigned int a_ID) const {
+    return (unsigned int)((a_ID & detectorTypeMask) >> detectorTypeBits);
+  }
+
+private:
+  void _clear() {
+    inlib::safe_clear<LHCb_State>(m_states);
+  }
+private:
+  inlib::rroot::ifac& m_fac;  
+private: //KeyedObject<int>
+  int m_key; 
+private: //this
+  double m_chi2PerDoF;
+  int m_nDoF;
+  unsigned int m_flags;
+  std::vector<LHCb_State*> m_states;
+};
+
+class KC_LHCb_Track : public virtual inlib::rroot::iro {
+public:
+  static const std::string& s_class() {
+    static const std::string s_v("pmx::KC_LHCb_Track");
+    return s_v;
+  }
+  static const std::string& s_store_class() {
+    static const std::string s_v("KeyedContainer<LHCb::Track,Containers::KeyedObjectManager<Containers::hashmap> >");
+    return s_v;
+  }
+public: //iro
+  virtual void* cast(const std::string& a_class) const {
+    if(void* p = inlib::cmp_cast<KC_LHCb_Track>(this,a_class)) {return p;}
+    else return 0;
+  }
+  virtual const std::string& s_cls() const {return s_class();}
+  virtual inlib::rroot::iro* copy() const {return new KC_LHCb_Track(*this);}
+public:
+  static inlib::cid id_class() {return KC_LHCb_Track_cid();}
+  virtual void* cast(inlib::cid a_class) const {
+    if(void* p = inlib::cmp_cast<KC_LHCb_Track>(this,a_class)) {return p;}
+    return 0;
+  }
+public:
+  virtual bool stream(inlib::rroot::buffer& a_buffer) {
+    _clear();
+
+    short v;
+    unsigned int s,c;
+    if(!a_buffer.read_version(v,s,c)) return false; //read one or three shorts.
+    //::printf("debug : v %d s %d c %d pos %d\n",v,s,c,a_buffer.length());
+
+    //streaming of vector<LHCb::Track*> m_sequential :
+
+    inlib::uint32 num;
+    if(!a_buffer.read(num)) return false;
+
+    //::printf("debug : KC_LHCb_Track : num %d\n",num);
+    inlib::rroot::ifac::args args;
+    for(unsigned int i=0;i<num;i++) {
+      //::printf("debug : KC_LHCb_Track :    n=%d i=%d ...\n",num,i);
+      iro* obj;
+      bool created;
+      if(!a_buffer.read_object(m_fac,args,obj,created)){
+        a_buffer.out() << "KC_LHCb_Track::stream :"
+                       << " can't read object."
+                       << std::endl;
+        return false;
+      }
+      if(obj) {
+        LHCb_Track* o = inlib::safe_cast<iro,LHCb_Track>(*obj);
+        if(!o) {
+          a_buffer.out() << "KC_LHCb_Track::stream :"
+                         << " inlib::safe_cast failed."
+                         << std::endl;
+        } else {
+          m_tracks.push_back(o);
+        }
+      }
+    }
+
+    if(!a_buffer.check_byte_count(s,c,s_store_class())) return false;
+ 
+    return true;
+  }
+public:
+  KC_LHCb_Track(inlib::rroot::ifac& a_fac)
+  :m_fac(a_fac){
+#ifdef INLIB_MEM
+    inlib::mem::increment(s_class().c_str());
+#endif
+  }
+  virtual ~KC_LHCb_Track(){
+    _clear();
+#ifdef INLIB_MEM
+    inlib::mem::decrement(s_class().c_str());
+#endif
+  }
+private:
+  KC_LHCb_Track(const KC_LHCb_Track& a_from)
+  :inlib::rroot::iro(a_from)
+  ,m_fac(a_from.m_fac)
+  {
+#ifdef INLIB_MEM
+    inlib::mem::increment(s_class().c_str());
+#endif
+  }
+  KC_LHCb_Track& operator=(const KC_LHCb_Track&){return *this;}
+public:
+  const std::vector<LHCb_Track*>& tracks() const {return m_tracks;}
+private:
+  void _clear() {
+    inlib::safe_clear<LHCb_Track>(m_tracks);
+  }
+private:
+  inlib::rroot::ifac& m_fac;  
+  std::vector<LHCb_Track*> m_tracks;
+};
+
+}
+
+#include <inlib/rroot/fac>
+
+namespace pmx {
+
+class fac : public inlib::rroot::fac {
+  typedef inlib::rroot::fac parent;
+public: //ifac
+  virtual inlib::rroot::iro* create(const std::string& a_class,const ifac::args& a_args) {
+    //m_out << "pmx::fac::create :"
+    //      << " create object of class " << a_class << "..."
+    //      << std::endl;
+    if(inlib::rcmp(a_class,KC_LHCb_Track::s_store_class())) {
+      return new KC_LHCb_Track(*this); //managed by the branch_element
+    } else if(inlib::rcmp(a_class,LHCb_Track::s_store_class())) {
+      return new LHCb_Track(*this); //managed by a KC_LHCb_Track.
+    } else if(inlib::rcmp(a_class,LHCb_State::s_store_class())) {
+      return new LHCb_State(); //managed by a LHCb_Track.
+    } else {
+      return parent::create(a_class,a_args);
+    }
+  }
+public:
+  fac(std::ostream& a_out):parent(a_out){}
+  virtual ~fac(){}
+private:
+  fac(const fac& a_from)
+  :inlib::rroot::ifac(a_from),parent(a_from){}
+  fac& operator=(const fac&){return *this;}
+};
+
+}
+
+#endif

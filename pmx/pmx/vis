@@ -1,0 +1,410 @@
+// Copyright (C) 2010, Guy Barrand. All rights reserved.
+// See the file pmx.license for terms.
+
+#ifndef pmx_pmx_vis
+#define pmx_pmx_vis
+
+#include <inlib/sg/gui_viewer>
+#include <inlib/sg/view_evd>
+#include <inlib/sg/field_cut>
+
+#include <inlib/geom3>
+#include <inlib/sg/markers>
+#include <inlib/wall/strings>
+
+#include <exlib/sg/view_wall>
+
+#include "LHCb"
+#include "dac"
+
+namespace pmx {
+
+inline bool vis_best(inlib::sg::gui_viewer& a_gv,
+                     inlib::rroot::ifile& a_file,
+                     inlib::rroot::branch_element& a_be,
+                     unsigned int a_event) {
+  inlib::sg::view_evd* _evd = inlib::sg::cast_view_evd(a_gv);
+  if(!_evd) return false;
+
+  unsigned int n;
+  if(!a_be.find_entry(a_file,a_event,n)) {
+    a_gv.out() << "pmx::vis_best :"
+               << " find event failed."
+               << std::endl;
+    a_gv.map_warn_failed();
+    return false;     
+  }
+
+  inlib::rroot::iro* o = a_be.object();
+  ::pmx::KC_LHCb_Track* kct = inlib::safe_cast<inlib::rroot::iro,::pmx::KC_LHCb_Track>(*o);
+  if(!kct) {
+    a_gv.out() << "pmx::vis_best :"
+               << " object not a pmx::KC_LHCb_Track."
+               << std::endl;
+    a_gv.map_warn_failed();
+    return false;     
+  }
+
+  //////////////////////////////////////
+  /// vis data, at last ! //////////////
+  //////////////////////////////////////
+
+  static unsigned int model_states_markers = 0;
+  static unsigned int model_tracks = 1;
+
+  //unsigned int model = model_states_markers;
+  unsigned int model = model_tracks;
+
+  if(model==model_states_markers) {  
+
+    inlib::sg::separator* sep = new inlib::sg::separator;
+  
+    sep->add(new inlib::sg::matrix);           //for move_manip.
+
+    inlib::sg::rgba* mat = new inlib::sg::rgba();
+    mat->color = inlib::colorf_cyan(); //better with black back.
+    sep->add(mat);
+      
+    //sep->add(new exlib::sg::normal);
+  
+    inlib::sg::draw_style* ds = new inlib::sg::draw_style;
+    ds->style = inlib::sg::draw_style::points;
+    ds->point_size = 10;
+    sep->add(ds);
+    
+    inlib::sg::markers* vtxs = new inlib::sg::markers;
+    //vtxs->style = inlib::gl::points();
+    sep->add(vtxs);
+
+    //optimize allocation :
+   {size_t num = 0;
+    const std::vector< ::pmx::LHCb_Track* >& trs = kct->tracks();
+    std::vector< ::pmx::LHCb_Track* >::const_iterator itt;
+    for(itt=trs.begin();itt!=trs.end();++itt) {
+      num += 3*(*itt)->states().size();
+    }
+    vtxs->xyzs.values().reserve(num);}
+  
+   {const std::vector< ::pmx::LHCb_Track* >& trs = kct->tracks();
+    std::vector< ::pmx::LHCb_Track* >::const_iterator itt;
+    for(itt=trs.begin();itt!=trs.end();++itt) {
+      const std::vector< ::pmx::LHCb_State* >& sts = (*itt)->states();
+      std::vector< ::pmx::LHCb_State* >::const_iterator its;
+      for(its=sts.begin();its!=sts.end();++its) {
+        vtxs->add(float((*its)->x()),float((*its)->y()),float((*its)->z()));
+      }
+    }}
+    
+    //out << "debug : points " << vtxs->number() << std::endl;
+    
+    if(vtxs->number()) { //something to draw.
+      inlib::sg::separator& evt_sep = _evd->event_sg();
+      evt_sep.clear();
+      evt_sep.add(sep);
+
+      inlib::args opts;
+      opts.add(inlib::wall::s_placement(),inlib::wall::s_dynamic());
+
+      exlib::sg::view_wall* wc = exlib::sg::cast_view_wall(a_gv);
+      if(wc) {if(!wc->send_sg(*sep,opts)){}}
+    } else {
+      delete sep;
+    }
+
+  } else if(model==model_tracks) {  
+
+    inlib::sg::separator* sep = new inlib::sg::separator;
+  
+    inlib::sg::draw_style* ds = new inlib::sg::draw_style;
+    ds->style = inlib::sg::draw_style::lines;
+    //ds->point_size = 10;
+    sep->add(ds);
+  
+    // coloring per type() in [0,8] :
+    std::vector<inlib::colorf> colors;
+
+    colors.push_back(inlib::colorf_white());       //TypeUnknown
+
+    colors.push_back(inlib::colorf_red());         //Velo
+    colors.push_back(inlib::colorf_magenta());     //VeloR
+
+    colors.push_back(inlib::colorf_blue());        //Long
+    colors.push_back(inlib::colorf_cyan());        //Upstream
+    colors.push_back(inlib::colorf_lightblue());   //Downstream
+
+    colors.push_back(inlib::colorf_orange());       //Ttrack
+    colors.push_back(inlib::colorf_yellow());       //Muon
+    colors.push_back(inlib::colorf_orchid());       //Calo
+
+    // should not happen :
+    colors.push_back(inlib::colorf_grey());         //TT
+
+    //unsigned int colorn = colors.size();
+
+    bool empty = true;
+
+    unsigned int ptn = 10;
+    float px,py,pz;
+
+   {const std::vector< ::pmx::LHCb_Track* >& trs = kct->tracks();
+    //unsigned trackn = trs.size();
+    //a_gv.out() << "debug : trackn " << trackn << std::endl;
+    unsigned tracki = 0;
+    std::vector< ::pmx::LHCb_Track* >::const_iterator itt;
+    for(itt=trs.begin();itt!=trs.end();++itt,tracki++) {
+
+      inlib::sg::rgba* mat = new inlib::sg::rgba();
+      //mat->color = colors[tracki%colorn];
+      mat->color = colors[(*itt)->type()];
+      sep->add(mat);
+    
+      const std::vector< ::pmx::LHCb_State* >& sts = (*itt)->states();
+      size_t stsn = sts.size();
+
+      if(stsn>=2) {
+        for(size_t stsi=0;stsi<(stsn-1);stsi++){
+          ::pmx::LHCb_State* sbeg = sts[stsi];
+          ::pmx::LHCb_State* send = sts[stsi+1];
+
+          inlib::cubic<float> cubic(
+            float(sbeg->x()),float(sbeg->y()),float(sbeg->z()),
+            float(sbeg->tx()),float(sbeg->ty()),float(sbeg->tz()),
+            float(send->x()),float(send->y()),float(send->z()),
+            float(send->tx()),float(send->ty()),float(send->tz()));
+
+          inlib::sg::vertices* vtxs = new inlib::sg::vertices;
+          vtxs->mode = inlib::gl::line_strip();
+          sep->add(vtxs);
+
+          for(unsigned int pti=0;pti<ptn;pti++){
+            cubic.get_point(pti,ptn,px,py,pz);
+            vtxs->add(px,py,pz);
+          }
+
+          empty = false;
+        }
+
+      } else {
+
+      }
+
+    }}
+  
+    //out << "debug : points " << vtxs->number() << std::endl;
+
+    if(empty) {
+      delete sep;
+    } else {
+      inlib::sg::separator& evt_sep = _evd->event_sg();
+      evt_sep.clear();
+      evt_sep.add(sep);
+
+      inlib::args opts;
+      opts.add(inlib::wall::s_placement(),inlib::wall::s_dynamic());
+
+      exlib::sg::view_wall* wc = exlib::sg::cast_view_wall(a_gv);
+      if(wc) {if(!wc->send_sg(*sep,opts)){}}
+    }
+  
+  }
+
+  return true;
+}
+
+}
+
+#include "magfield"
+#include <inlib/sg/colormap>
+
+namespace pmx {
+
+typedef magfield::field_grid grid_t;
+
+class mfcut : public inlib::sg::field_cut {
+  INLIB_NODE(mfcut,pmx::mfcut,inlib::sg::field_cut)
+private:
+public:
+  virtual bool field_vector(float a_x,float a_y,float a_z,
+                            float& a_fx,float& a_fy,float& a_fz,
+                            float& a_r,float& a_g,float& a_b,float& a_a) {
+    m_center.set_value(a_x,a_y,a_z);
+    bool status = m_grid.field_by_interpolation(m_center,m_magf);
+    //bool status = m_grid.field_at_closest_point(m_center,m_magf);
+    a_fx = float(m_magf[0]);
+    a_fy = float(m_magf[1]);
+    a_fz = float(m_magf[2]);
+    double value = m_magf.length();
+    m_cmap.get_color((float(value)-field_min)/(field_max-field_min),m_col);
+    a_r = m_col.r();
+    a_g = m_col.g();
+    a_b = m_col.b();
+    a_a = m_col.a();
+    return status;
+  }
+public:
+  inlib::sg::sf<float> field_min; 
+  inlib::sg::sf<float> field_max; 
+public:
+  virtual const inlib::sg::desc_fields& node_desc_fields() const {
+    INLIB_FIELD_DESC_NODE_CLASS(pmx::mfcut)
+    static const inlib::sg::desc_fields s_v(parent::node_desc_fields(),2, //WARNING : take care of count.
+      INLIB_ARG_FIELD_DESC(field_min),
+      INLIB_ARG_FIELD_DESC(field_max)
+    );
+    return s_v;
+  }
+private:
+  void add_fields(){
+    add_field(&field_min);
+    add_field(&field_max);
+  }
+public:
+  virtual void render(inlib::sg::render_action& a_action) {
+    if(field_min.touched()||field_max.touched()) {
+      if((field_min.value()<0)||(field_max.value()<0)) {
+        double fmin,fmax;
+        unsigned int cmax;
+        m_grid.field_min_max(fmin,fmax,cmax); 
+        field_min = float(fmin);
+        field_max = float(fmax);
+      }
+      m_cmap.set(field_min.value(),field_max.value(),100);
+      field_min.reset_touched();
+      field_max.reset_touched();
+    }
+    parent::render(a_action);
+  }
+  virtual bool write(inlib::sg::write_action& a_action) {
+    inlib::sg::atb_vertices bnode(*this); //can we avoid the copy ?
+    return bnode.write(a_action);
+  }
+public:
+  mfcut(const grid_t& a_grid)
+  :parent()
+
+  ,field_min(-1)
+  ,field_max(-1)
+
+  ,m_grid(a_grid)
+  ,m_cmap(field_min.value(),field_max.value(),100)
+  {}
+  virtual ~mfcut(){}
+public:
+  mfcut(const mfcut& a_from)
+  :parent(a_from)
+
+  ,field_min(a_from.field_min)
+  ,field_max(a_from.field_max)
+
+  ,m_grid(a_from.m_grid)
+  ,m_cmap(a_from.m_cmap)
+  {}
+  mfcut& operator=(const mfcut& a_from){
+    parent::operator=(a_from);
+
+    field_min = a_from.field_min;
+    field_max = a_from.field_max;
+
+    m_cmap = a_from.m_cmap;
+    return *this;
+  }
+protected:
+  const grid_t& m_grid;
+  inlib::vec3d m_center;
+  inlib::vec3d m_magf;
+  inlib::sg::violet_to_red_colormap m_cmap;
+  inlib::colorf m_col;
+};
+
+INLIB_GLOBAL_STRING(pmx_mag_grid)
+
+inline bool vis_magfield(inlib::sg::gui_viewer& a_gv) {
+  inlib::sg::view_evd* _evd = inlib::sg::cast_view_evd(a_gv);
+  if(!_evd) return false;
+  dac* _dac = cast_dac(a_gv);
+  if(!_dac) return false;
+
+  if(!_dac->m_grid) {
+    const std::string& res_dir = a_gv.res_dir();
+
+    std::vector<std::string> files;
+    files.push_back(res_dir+inlib::sep()+"field048_c1_vp.cdf");
+    files.push_back(res_dir+inlib::sep()+"field048_c2_vp.cdf");
+    files.push_back(res_dir+inlib::sep()+"field048_c3_vp.cdf");
+    files.push_back(res_dir+inlib::sep()+"field048_c4_vp.cdf");
+
+    _dac->m_grid = new magfield::field_grid;
+    if(!magfield::read_files(a_gv.out(),files,*_dac->m_grid)) {
+      a_gv.map_warn("can't read mag field .cdf files.");
+      delete _dac->m_grid;
+      _dac->m_grid = 0;
+      return false;
+    }
+
+    //field_grid::m_Dxyz 100 100 100, field_grid::Nxyz 81 81 146
+
+/*
+    ::printf("debug : Dxyz %g %g %g, Nxyz %d %d %d\n",
+        _dac->m_grid->m_Dxyz[0],_dac->m_grid->m_Dxyz[1],_dac->m_grid->m_Dxyz[2],
+        _dac->m_grid->m_Nxyz[0],_dac->m_grid->m_Nxyz[1],_dac->m_grid->m_Nxyz[2]);
+
+    inlib::sg::field3d f3d;
+    f3d.nx = grid->m_Nxyz[0];
+    f3d.ny = grid->m_Nxyz[1];
+    f3d.nz = grid->m_Nxyz[2];
+
+    f3d.dx = grid->m_Dxyz[0];
+    f3d.dy = grid->m_Dxyz[1];
+    f3d.dz = grid->m_Dxyz[2];
+
+    f3d.ox = grid->m_min_FL[0];  
+    f3d.oy = grid->m_min_FL[1];  
+    f3d.oz = grid->m_min_FL[2];  
+
+    f3d.scale = grid->m_scaleFactor;
+    f3d.vectors.set_values(grid->m_Q);
+
+    inlib::sg::write_bsg _action(a_gv.out());
+    if(!_action.open_buffer()) {}
+    if(!f3d.write(_action)) {}
+    if(!_action.close_buffer()) {}
+    if(!_action.write_file("magfield.bsg")) {}
+*/
+  } 
+
+  if(!_evd->is_evd()) {
+    float scene_radius = 15000*0.5f;
+    _evd->create_sg_evd(scene_radius);
+  }
+
+ {inlib::sg::separator* sep = new inlib::sg::separator;
+  _evd->detector_sg().add(sep);
+
+  inlib::sg::matrix* mtx = new inlib::sg::matrix;
+  mtx->mtx.set_translate(0,0,5200);
+  sep->add(mtx);
+
+  mfcut* node = new mfcut(*_dac->m_grid);  
+  node->field_min = 0.0001f;
+  node->field_max = 0.003f;
+  node->sx = 50;
+  node->sy = 50;
+  node->nx = 160;
+  node->ny = 160;
+  node->depth = 4000;
+  sep->add(node);
+
+  inlib::args opts;
+  opts.add(inlib::wall::s_placement(),inlib::wall::s_static());
+
+  exlib::sg::view_wall* wc = exlib::sg::cast_view_wall(a_gv);
+  if(wc) {if(!wc->send_sg(*sep,opts)){}}}
+
+  a_gv.hide_main_menu();
+
+  return true;
+}
+
+}
+
+#endif

@@ -1,0 +1,5 @@
+h/file 10 pawhists.root
+h/file 10 ../data/pawhists.root
+ldir
+ldir //
+ldir //LUN10

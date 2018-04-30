@@ -1,0 +1,67 @@
+// Copyright (C) 2010, Guy Barrand. All rights reserved.
+// See the file pmx.license for terms.
+
+#ifndef pmx_sg_dac
+#define pmx_sg_dac
+
+//dac = data accessor
+
+#include <inlib/sg/gui_viewer>
+#include <inlib/rroot/file>
+#include <inlib/rroot/fac>
+#include <inlib/rroot/tree>
+
+#include "magfield"
+
+namespace pmx {
+
+class dac {
+public:
+  INLIB_SCLASS(pmx::dac)
+public:
+  dac(inlib::sg::gui_viewer& a_gv)
+  :m_gv(a_gv)
+  ,m_file(0)
+  ,m_fac(0)
+  ,m_tree(0)
+  ,m_grid(0)
+  {}
+  virtual ~dac(){
+    delete m_tree;
+    delete m_fac;
+    delete m_file;
+    delete m_grid;
+  }
+protected:
+  dac(const dac& a_from)
+  :m_gv(a_from.m_gv)
+  ,m_file(0)
+  ,m_fac(0)
+  ,m_tree(0)
+  ,m_grid(0)
+  {}
+  dac& operator=(const dac& a_from){return *this;}
+public:
+  void reset_file() {
+    delete m_tree;
+    delete m_fac;
+    delete m_file;
+    m_tree = 0;
+    m_fac = 0;
+    m_file = 0;  
+  }
+public:
+  inlib::sg::gui_viewer& m_gv;
+  inlib::rroot::file* m_file;
+  inlib::rroot::fac* m_fac;
+  inlib::rroot::tree* m_tree;
+  magfield::field_grid* m_grid;
+};
+
+inline dac* cast_dac(inlib::sg::viewer& a_viewer) {
+  return inlib::safe_cast<inlib::sg::viewer,dac>(a_viewer);
+}
+
+}
+
+#endif
