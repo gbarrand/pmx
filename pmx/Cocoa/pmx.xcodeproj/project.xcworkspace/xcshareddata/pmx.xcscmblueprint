@@ -1,0 +1,44 @@
+{
+  "DVTSourceControlWorkspaceBlueprintPrimaryRemoteRepositoryKey" : "9F62CD1B12D1FE9182ABE49E6676C8E1E10E444F",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyRepositoryLocationsKey" : {
+
+  },
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyStatesKey" : {
+    "62C9594D8D16155005921ADBAE2E8C229D3810E3" : 0,
+    "9C1A12B3B2D4DE96E656CF93E9F663493583E178" : 0,
+    "E3B6AFE72DFE00C4A98A5F5ABEECED5EF1AAFAC5" : 0,
+    "9F62CD1B12D1FE9182ABE49E6676C8E1E10E444F" : 0
+  },
+  "DVTSourceControlWorkspaceBlueprintIdentifierKey" : "892A4827-3646-49C0-A959-A0C3645BFE14",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyPathsKey" : {
+    "62C9594D8D16155005921ADBAE2E8C229D3810E3" : "inexlib\/",
+    "9C1A12B3B2D4DE96E656CF93E9F663493583E178" : "",
+    "E3B6AFE72DFE00C4A98A5F5ABEECED5EF1AAFAC5" : "inexlib\/ourex\/",
+    "9F62CD1B12D1FE9182ABE49E6676C8E1E10E444F" : "pmx\/"
+  },
+  "DVTSourceControlWorkspaceBlueprintNameKey" : "pmx",
+  "DVTSourceControlWorkspaceBlueprintVersion" : 204,
+  "DVTSourceControlWorkspaceBlueprintRelativePathToProjectKey" : "Cocoa\/pmx.xcodeproj",
+  "DVTSourceControlWorkspaceBlueprintRemoteRepositoriesKey" : [
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "lx3.lal.in2p3.fr:\/exp\/si\/barrand\/git_repos\/inexlib.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "62C9594D8D16155005921ADBAE2E8C229D3810E3"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "lx3.lal.in2p3.fr:\/exp\/si\/barrand\/git_repos\/softinex.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "9C1A12B3B2D4DE96E656CF93E9F663493583E178"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "lx3.lal.in2p3.fr:\/exp\/si\/barrand\/git_repos\/pmx.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "9F62CD1B12D1FE9182ABE49E6676C8E1E10E444F"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "lx3.lal.in2p3.fr:\/exp\/si\/barrand\/git_repos\/ourex.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "E3B6AFE72DFE00C4A98A5F5ABEECED5EF1AAFAC5"
+    }
+  ]
+}
