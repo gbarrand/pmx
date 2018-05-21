@@ -5,9 +5,9 @@
 #define pmx_pmx_version
 
 #define PMX_MAJOR_VERSION 1
-#define PMX_MINOR_VERSION 2
-#define PMX_PATCH_VERSION 1
-#define PMX_VERSION "1.2.1"
-#define PMX_VERSION_VRP "v1r2p1"
+#define PMX_MINOR_VERSION 3
+#define PMX_PATCH_VERSION 0
+#define PMX_VERSION "1.3.0"
+#define PMX_VERSION_VRP "v1r3p0"
 
 #endif
