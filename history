@@ -1,0 +1,8 @@
+1.3 :
+ - magfield.
+ - detector/*.bsg files.
+
+1.2 :
+ - exlib/pmx -> pmx.
+ - Android : Main_java : corrections to handle ACTION_SCREEN_ON.
+ - dir iPhone -> iOS.
