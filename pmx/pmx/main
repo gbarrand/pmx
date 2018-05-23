@@ -38,6 +38,7 @@ protected:
 #include "dac"
 #include "actions"
 #include "opener"
+#include "evt_bsg_opener"
 
 namespace pmx {
 
@@ -117,6 +118,11 @@ protected:
                        m_camenu_sep,a_wcw,a_wch,a_wb,a_hb,0,
                        0,3,"next","","event.jpg",
                        new inlib::sg::gv_cbk(*this,action_next));
+
+    //create_main_button(m_out,m_res_dir,m_params,
+    //                   m_camenu_sep,a_wcw,a_wch,a_wb,a_hb,0,
+    //                   2,0,"clear","","edit_clear.jpg",
+    //                   new inlib::sg::gv_cbk(*this,inlib::sg::action_clear_dynamic_sg));
   }
 
 public:
@@ -156,16 +162,19 @@ public:
     m_opener.clear_exts();
     m_opener.add_ext(".dst");
     m_opener.add_opener(s_format_dst(),new pmx::opener());
+
+    m_opener.add_ext(inlib::file::s_ext_bsg());
+   {inlib::sg::bsg_factories bfac;
+    inlib::sg::add_factories(bfac);
+    exlib::sg::add_factories(bfac);
+    m_opener.add_opener(inlib::file::s_format_bsg(),new pmx::evt_bsg_opener(bfac));}
+
     m_image_readers.add_reader(inlib::file::s_format_jpeg(),new exlib::jpeg::reader());
     m_image_readers.add_reader(inlib::file::s_format_png(),new exlib::png::reader());
   }
   virtual ~main() {}
 protected:
-  main(const main& a_from)
-  :parent(a_from)
-  ,inlib::sg::view_evd(a_from)
-  ,dac(a_from)
-  {}
+  main(const main& a_from):parent(a_from),inlib::sg::view_evd(a_from),dac(a_from) {}
 private:
   main& operator=(const main&){return *this;}
 };
