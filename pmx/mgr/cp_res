@@ -69,6 +69,14 @@ files="${files} icon.jpg favicon.ico"
 find ../res -name '*.bsg' -exec /bin/cp {} ../comres/. \;
 find ../res -name '*.cdf' -exec /bin/cp {} ../comres/. \;
 
+${bush_home}/find_rm ../comres 'evt_*.bsg'
+/bin/cp ../res/evt_0.bsg ../comres/.
+/bin/cp ../res/evt_3.bsg ../comres/.
+/bin/cp ../res/evt_bs_mu_mu_2012_0.bsg ../comres/.
+/bin/cp ../res/evt_bs_mu_mu_2012_3.bsg ../comres/.
+/bin/cp ../res/evt_bu_2_jpsi_k_00011917_00000048_1_2.bsg ../comres/.
+/bin/cp ../res/evt_bu_2_jpsi_k_00011917_00000048_1_3.bsg ../comres/.
+
 for file in ${files} ; do
   /bin/cp ../res/${file} ../comres/.
 done
