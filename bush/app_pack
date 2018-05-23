@@ -54,15 +54,23 @@ for config in ${configs} ; do
   /bin/rm -f ./main.cpp
 done
 
-${inlib_incs} ${verbose} -pack -dirs=${dirs} -nos=${nos} -to="${to}/${app}/mgr" ../X11/main.cpp
-${inlib_incs} ${verbose} -pack -dirs=${dirs} -nos=${nos} -to="${to}/${app}/mgr" ../Windows/main.cpp
-${inlib_incs} ${verbose} -pack -dirs=${dirs} -nos=${nos} -to="${to}/${app}/mgr" ../offscreen/main.cpp
-${inlib_incs} ${verbose} -pack -dirs=${dirs} -nos=${nos} -to="${to}/${app}/mgr" ../WebGL/main.cpp
+if [ ${app} = gopaw ] ; then
+  ${inlib_incs} ${verbose} -pack -dirs=${dirs} -nos=${nos} -to="${to}/${app}/mgr" ../source/gopaw.cpp
+  ${inlib_incs} ${verbose} -pack -dirs=${dirs} -nos=${nos} -to="${to}/${app}/mgr" ../source/PAW.cpp
+#  ${inlib_incs} ${verbose} -pack -dirs=${dirs} -nos=${nos} -to="${to}/${app}/mgr" ../source/UI_offscreen
+  ${inlib_incs} ${verbose} -pack -dirs=${dirs} -nos=${nos} -to="${to}/${app}/mgr" ../../inexlib/exlib/exlib/swig/inlib_i
+else
+  ${inlib_incs} ${verbose} -pack -dirs=${dirs} -nos=${nos} -to="${to}/${app}/mgr" ../X11/main.cpp
+  ${inlib_incs} ${verbose} -pack -dirs=${dirs} -nos=${nos} -to="${to}/${app}/mgr" ../Windows/main.cpp
+  ${inlib_incs} ${verbose} -pack -dirs=${dirs} -nos=${nos} -to="${to}/${app}/mgr" ../offscreen/main.cpp
+  ${inlib_incs} ${verbose} -pack -dirs=${dirs} -nos=${nos} -to="${to}/${app}/mgr" ../WebGL/main.cpp
 
-${inlib_incs} ${verbose} -pack -dirs=${dirs} -nos=${nos} -to="${to}/${app}/mgr" ../Cocoa/main.mm
-${inlib_incs} ${verbose} -pack -dirs=${dirs} -nos=${nos} -to="${to}/${app}/mgr" ../Cocoa/main.mm
-${inlib_incs} ${verbose} -pack -dirs=${dirs} -nos=${nos} -to="${to}/${app}/mgr" ../Cocoa/GLView.mm
-${inlib_incs} ${verbose} -pack -dirs=${dirs} -nos=${nos} -to="${to}/${app}/mgr" ../iOS/Classes/GLView.mm
+  ${inlib_incs} ${verbose} -pack -dirs=${dirs} -nos=${nos} -to="${to}/${app}/mgr" ../Cocoa/main.mm
+  ${inlib_incs} ${verbose} -pack -dirs=${dirs} -nos=${nos} -to="${to}/${app}/mgr" ../Cocoa/main.mm
+  ${inlib_incs} ${verbose} -pack -dirs=${dirs} -nos=${nos} -to="${to}/${app}/mgr" ../Cocoa/GLView.mm
+  ${inlib_incs} ${verbose} -pack -dirs=${dirs} -nos=${nos} -to="${to}/${app}/mgr" ../iOS/Classes/GLView.mm
+
+fi
 
 ${inlib_incs} ${verbose} -pack -dirs=${dirs} -nos=${nos} -to="${to}/${app}/mgr" ${bush_home}/cpp/platform.cpp
 ${inlib_incs} ${verbose} -pack -dirs=${dirs} -nos=${nos} -to="${to}/${app}/mgr" ${bush_home}/visual/windef.c
@@ -90,6 +98,7 @@ items="${items} freetype jpeg png expat gl2ps zip zlib csz"
 if [ ${app} = g4exa ] ; then items="${items} AIDA";fi
 if [ ${app} = g4view ] ; then items="${items} pythia8";fi
 if [ ${app} = TouchSky ] ; then items="${items} cfitsio hdf5 wcslib lua";fi
+if [ ${app} = gopaw ] ; then items="${items} KUIP Getline Python hdf5";fi
 for item in ${items} ; do
   /bin/cp -R ${ourex_home}/${item} ${to}/inexlib/ourex/.
 done
@@ -144,8 +153,9 @@ fi
 if [ ${app} = TouchSky ] ; then
   /bin/mkdir -p ${to}/inexlib/exlib/exlib/slua
   /bin/cp ${exlib_home}/exlib/slua/inlib_swig_lua.cpp ${to}/inexlib/exlib/exlib/slua/.
-  /bin/cp ${exlib_home}/exlib/slua/exlib_swig_lua.cpp ${to}/inexlib/exlib/exlib/slua/.
   /bin/cp ${exlib_home}/exlib/slua/inlib_swig_lua.icc ${to}/inexlib/exlib/exlib/slua/.
+
+  /bin/cp ${exlib_home}/exlib/slua/exlib_swig_lua.cpp ${to}/inexlib/exlib/exlib/slua/.
   /bin/cp ${exlib_home}/exlib/slua/exlib_swig_lua.icc ${to}/inexlib/exlib/exlib/slua/.
 
   /bin/mkdir -p ${to}/inexlib/exlib/exlib/swig
@@ -161,6 +171,39 @@ if [ ${app} = TouchSky ] ; then
   /bin/mkdir -p ${to}/inexlib/exlib/exlib/spy
   /bin/cp ${exlib_home}/exlib/spy/inlib.py ${to}/inexlib/exlib/exlib/spy/.
   /bin/cp ${exlib_home}/exlib/spy/exlib.py ${to}/inexlib/exlib/exlib/spy/.
+fi
+
+if [ ${app} = gopaw ] ; then
+  /bin/cp ../source/PAWCDF.c   ${to}/gopaw/source/.
+  /bin/cp ../source/gopawcdf.c ${to}/gopaw/source/.
+
+  /bin/mkdir -p ${to}/inexlib/exlib/exlib/spy
+  /bin/cp ${exlib_home}/exlib/spy/inlib_swig_py.cpp ${to}/inexlib/exlib/exlib/spy/.
+  /bin/cp ${exlib_home}/exlib/spy/inlib_swig_py.icc ${to}/inexlib/exlib/exlib/spy/.
+
+  /bin/mkdir -p ${to}/inexlib/exlib/exlib/swig
+  /bin/cp ${exlib_home}/exlib/swig/inlib_i ${to}/inexlib/exlib/exlib/swig/.
+  /bin/cp ${inlib_home}/inlib/printer ${to}/inexlib/inlib/inlib/.
+  /bin/cp ${inlib_home}/inlib/get_cout ${to}/inexlib/inlib/inlib/.
+  /bin/cp -R ${inlib_home}/inlib/waxml ${to}/inexlib/inlib/inlib/.
+  /bin/cp -R ${inlib_home}/inlib/rroot ${to}/inexlib/inlib/inlib/.
+  /bin/cp -R ${inlib_home}/inlib/store ${to}/inexlib/inlib/inlib/.
+  /bin/cp -R ${inlib_home}/inlib/hep   ${to}/inexlib/inlib/inlib/.
+
+  /bin/cp ${exlib_home}/exlib/spy/inlib.py ${to}/inexlib/exlib/exlib/spy/.
+
+  /bin/mkdir -p ${to}/inexlib/exlib/exlib/yacc
+  /bin/cp -R ${exlib_home}/exlib/yacc   ${to}/inexlib/exlib/exlib/.
+  /bin/cp ${inlib_home}/inlib/mathT  ${to}/inexlib/inlib/inlib/.
+
+  /bin/mkdir -p ${to}/inexlib/ourex/HEPVis
+  /bin/cp -R ${ourex_home}/HEPVis/fonts ${to}/inexlib/ourex/HEPVis/.
+
+  /bin/cp -R ../scripts  ${to}/gopaw/.
+  ./clean_exas
+  /bin/cp -R ../examples ${to}/gopaw/.
+
+  /bin/cp ../doc/README_for_pack ${to}/README
 fi
 
 if [ ${app} = ArcheryTune ] ; then
