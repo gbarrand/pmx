@@ -171,6 +171,12 @@ public:
 
     m_image_readers.add_reader(inlib::file::s_format_jpeg(),new exlib::jpeg::reader());
     m_image_readers.add_reader(inlib::file::s_format_png(),new exlib::png::reader());
+
+    if(inlib::device::is_Android()) {
+      // When triggering a camenu button, we receive AMOTION_EVENT_ACTION_MOVE, which
+      // will induce scene rotation if m_param.m_touch_move is true (see gui_viewer::touch_move()).
+      m_params.m_touch_move = false;
+    }
   }
   virtual ~main() {}
 protected:
