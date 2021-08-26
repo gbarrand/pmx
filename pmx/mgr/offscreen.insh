@@ -1,0 +1,69 @@
+#!insh
+
+startup.insh
+
+gui_hide_main_menu
+
+#//////////////////////////////////
+#/// default geometry : ///////////
+#//////////////////////////////////
+scene_clear_static
+camera_default.insh
+default_geometry.insh
+scene_write_to_paper -format=inzb_ps out_default_geometry.ps
+scene_write_to_paper -format=inzb_png out_default_geometry.png
+
+#//////////////////////////////////
+#/// mag field : //////////////////
+#//////////////////////////////////
+scene_clear_static
+scene_set_clear_color white
+camera_front.insh
+vis_magnetic_field
+camera_view_all
+scene_write_to_paper -format=inzb_ps out_mag_field.ps
+scene_write_to_paper -format=inzb_png out_mag_field.png
+
+#//////////////////////////////////
+#/// detector + event : ///////////
+#//////////////////////////////////
+scene_clear_static
+scene_set_clear_color black
+scene_light_on
+camera_setup_3d.insh
+scene_read_bsg -file=magnet.bsg
+scene_read_bsg -file=rich2.bsg
+# event :
+app_open_event_file -res bdpi_ghost.dst
+event_next
+
+scene_write_to_paper -format=inzb_ps out.ps
+scene_write_to_paper -format=inzb_png out.png
+scene_write_to_paper -format=inzb_jpeg out.jpeg
+
+#//////////////////////////////////
+#//////////////////////////////////
+#//////////////////////////////////
+scene_write_to_paper -format=gl2ps_eps out_gl2ps.eps
+scene_write_to_paper -format=gl2ps_ps  out_gl2ps.ps
+scene_write_to_paper -format=gl2ps_pdf out_gl2ps.pdf
+scene_write_to_paper -format=gl2ps_svg out_gl2ps.svg
+scene_write_to_paper -format=gl2ps_tex out_gl2ps.tex
+scene_write_to_paper -format=gl2ps_pgf out_gl2ps.pgf
+
+#///////////////////////////////////
+#/// detector + bsg event + 3D : ///
+#///////////////////////////////////
+scene_clear_static
+scene_set_clear_color black
+scene_light_on
+camera_default.insh
+camera_3d.insh
+scene_read_bsg -file=magnet.bsg
+scene_read_bsg -file=evt_bu_2_jpsi_k_00011917_00000048_1_2.bsg
+
+scene_write_to_paper -format=inzb_ps out_3d.ps
+scene_write_to_paper -format=inzb_png out_3d.png
+scene_write_to_paper -format=inzb_jpeg out_3d.jpeg
+
+
