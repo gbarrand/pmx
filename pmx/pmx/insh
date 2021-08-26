@@ -1,0 +1,56 @@
+// Copyright (C) 2010, Guy Barrand. All rights reserved.
+// See the file pmx.license for terms.
+
+#ifndef pmx_insh
+#define pmx_insh
+
+#include "dac"
+#include "vis"
+
+#include <inlib/insh/ishell>
+
+namespace pmx {
+
+inline void insh_event_vis(inlib::ishell& a_insh,const std::vector<std::string>& a_args,inlib::sg::gui_viewer& a_gv) {
+  static const std::string s_header("event_vis :");
+  inlib::sg::view_evd* _evd = inlib::sg::cast_view_evd(a_gv);
+  if(!_evd) return;
+  dac* _dac = cast_dac(a_gv);
+  if(!_dac) return;
+  const KC_LHCb_Track* _event = _dac->event();
+  if(!_event) {
+    a_insh.warn(s_header+" no event");
+    return;     
+  }
+  if(!vis_best(a_gv,*_event)) {}
+}
+
+inline void insh_vis_magnetic_field(inlib::ishell&,const std::vector<std::string>&,inlib::sg::gui_viewer& a_gv) {
+  vis_magfield(a_gv);
+}
+
+}
+
+#include <inlib/insh/ishell_args_gui_viewer_cmd>
+#include <inlib/insh/dac_event>
+
+#define PMX_INSH_ADDS(a__insh,a__viewer)\
+  INLIB_INSH_DAC_EVENT_ADDS(a__insh,a__viewer)\
+  INLIB_INSH_ADD_ISHELL_ARGS_GUI_VIEWER_CMD(a__insh,a__viewer,app_open_event_file,\
+    inlib::insh_app_open_event_file<dac>,\
+"app_open_event_file: app_open_event_file [-doc_res,-res,-doc] path\n\
+  Open a root event file.\n\
+  If no directory is given in path, the -doc_res option permits to search a file first\n\
+  in the document directory declared to the app, and then in the app (internal) resource directory.\n\
+  -res for the resource directory only, -doc for the document directory only.\n\
+  See also : app_dir.\n\
+")\
+  INLIB_INSH_ADD_ISHELL_ARGS_GUI_VIEWER_CMD(a__insh,a__viewer,event_vis,\
+    pmx::insh_event_vis,inlib::insh::no_help())\
+  INLIB_INSH_ADD_ISHELL_ARGS_GUI_VIEWER_CMD(a__insh,a__viewer,vis_magnetic_field,\
+    pmx::insh_vis_magnetic_field,\
+"vis_magnetic_field: vis_magnetic_field\n\
+  Visualize the magnetic field from the field*.cdf files.\n\
+")
+
+#endif
