@@ -1,49 +1,24 @@
 // Copyright (C) 2010, Guy Barrand. All rights reserved.
 // See the file pmx.license for terms.
 
-#ifndef pmx_pmx_vis
-#define pmx_pmx_vis
+#ifndef pmx_vis
+#define pmx_vis
+
+#include "LHCb"
 
 #include <inlib/sg/gui_viewer>
 #include <inlib/sg/view_evd>
-#include <inlib/sg/field_cut>
 
-#include <inlib/geom3>
+#include <inlib/lina/geom3>
 #include <inlib/sg/markers>
-#include <inlib/wall/strings>
 
-#include <exlib/sg/view_wall>
-
-#include "LHCb"
-#include "dac"
+#include <inlib/sg/view_sg_client>
 
 namespace pmx {
 
-inline bool vis_best(inlib::sg::gui_viewer& a_gv,
-                     inlib::rroot::ifile& a_file,
-                     inlib::rroot::branch_element& a_be,
-                     unsigned int a_event) {
+inline bool vis_best(inlib::sg::gui_viewer& a_gv,const KC_LHCb_Track& a_event) {
   inlib::sg::view_evd* _evd = inlib::sg::cast_view_evd(a_gv);
   if(!_evd) return false;
-
-  unsigned int n;
-  if(!a_be.find_entry(a_file,a_event,n)) {
-    a_gv.out() << "pmx::vis_best :"
-               << " find event failed."
-               << std::endl;
-    a_gv.map_warn_failed();
-    return false;     
-  }
-
-  inlib::rroot::iro* o = a_be.object();
-  ::pmx::KC_LHCb_Track* kct = inlib::safe_cast<inlib::rroot::iro,::pmx::KC_LHCb_Track>(*o);
-  if(!kct) {
-    a_gv.out() << "pmx::vis_best :"
-               << " object not a pmx::KC_LHCb_Track."
-               << std::endl;
-    a_gv.map_warn_failed();
-    return false;     
-  }
 
   //////////////////////////////////////
   /// vis data, at last ! //////////////
@@ -68,7 +43,7 @@ inline bool vis_best(inlib::sg::gui_viewer& a_gv,
     //sep->add(new exlib::sg::normal);
   
     inlib::sg::draw_style* ds = new inlib::sg::draw_style;
-    ds->style = inlib::sg::draw_style::points;
+    ds->style = inlib::sg::draw_points;
     ds->point_size = 10;
     sep->add(ds);
     
@@ -78,18 +53,18 @@ inline bool vis_best(inlib::sg::gui_viewer& a_gv,
 
     //optimize allocation :
    {size_t num = 0;
-    const std::vector< ::pmx::LHCb_Track* >& trs = kct->tracks();
-    std::vector< ::pmx::LHCb_Track* >::const_iterator itt;
+    const std::vector<LHCb_Track*>& trs = a_event.tracks();
+    std::vector<LHCb_Track*>::const_iterator itt;
     for(itt=trs.begin();itt!=trs.end();++itt) {
       num += 3*(*itt)->states().size();
     }
     vtxs->xyzs.values().reserve(num);}
   
-   {const std::vector< ::pmx::LHCb_Track* >& trs = kct->tracks();
-    std::vector< ::pmx::LHCb_Track* >::const_iterator itt;
+   {const std::vector<LHCb_Track*>& trs = a_event.tracks();
+    std::vector<LHCb_Track*>::const_iterator itt;
     for(itt=trs.begin();itt!=trs.end();++itt) {
-      const std::vector< ::pmx::LHCb_State* >& sts = (*itt)->states();
-      std::vector< ::pmx::LHCb_State* >::const_iterator its;
+      const std::vector<LHCb_State*>& sts = (*itt)->states();
+      std::vector<LHCb_State*>::const_iterator its;
       for(its=sts.begin();its!=sts.end();++its) {
         vtxs->add(float((*its)->x()),float((*its)->y()),float((*its)->z()));
       }
@@ -98,14 +73,14 @@ inline bool vis_best(inlib::sg::gui_viewer& a_gv,
     //out << "debug : points " << vtxs->number() << std::endl;
     
     if(vtxs->number()) { //something to draw.
-      inlib::sg::separator& evt_sep = _evd->event_sg();
+      inlib::sg::separator& evt_sep = _evd->dynamic_sg();
       evt_sep.clear();
       evt_sep.add(sep);
 
       inlib::args opts;
-      opts.add(inlib::wall::s_placement(),inlib::wall::s_dynamic());
+      opts.add(inlib::sg::s_send_placement(),inlib::sg::s_placement_dynamic());
 
-      exlib::sg::view_wall* wc = exlib::sg::cast_view_wall(a_gv);
+      inlib::sg::view_sg_client* wc = inlib::sg::cast_view_sg_client(a_gv);
       if(wc) {if(!wc->send_sg(*sep,opts)){}}
     } else {
       delete sep;
@@ -116,7 +91,7 @@ inline bool vis_best(inlib::sg::gui_viewer& a_gv,
     inlib::sg::separator* sep = new inlib::sg::separator;
   
     inlib::sg::draw_style* ds = new inlib::sg::draw_style;
-    ds->style = inlib::sg::draw_style::lines;
+    ds->style = inlib::sg::draw_lines;
     //ds->point_size = 10;
     sep->add(ds);
   
@@ -146,11 +121,11 @@ inline bool vis_best(inlib::sg::gui_viewer& a_gv,
     unsigned int ptn = 10;
     float px,py,pz;
 
-   {const std::vector< ::pmx::LHCb_Track* >& trs = kct->tracks();
+   {const std::vector<LHCb_Track*>& trs = a_event.tracks();
     //unsigned trackn = trs.size();
     //a_gv.out() << "debug : trackn " << trackn << std::endl;
     unsigned tracki = 0;
-    std::vector< ::pmx::LHCb_Track* >::const_iterator itt;
+    std::vector<LHCb_Track*>::const_iterator itt;
     for(itt=trs.begin();itt!=trs.end();++itt,tracki++) {
 
       inlib::sg::rgba* mat = new inlib::sg::rgba();
@@ -158,13 +133,13 @@ inline bool vis_best(inlib::sg::gui_viewer& a_gv,
       mat->color = colors[(*itt)->type()];
       sep->add(mat);
     
-      const std::vector< ::pmx::LHCb_State* >& sts = (*itt)->states();
+      const std::vector<LHCb_State*>& sts = (*itt)->states();
       size_t stsn = sts.size();
 
       if(stsn>=2) {
         for(size_t stsi=0;stsi<(stsn-1);stsi++){
-          ::pmx::LHCb_State* sbeg = sts[stsi];
-          ::pmx::LHCb_State* send = sts[stsi+1];
+          LHCb_State* sbeg = sts[stsi];
+          LHCb_State* send = sts[stsi+1];
 
           inlib::cubic<float> cubic(
             float(sbeg->x()),float(sbeg->y()),float(sbeg->z()),
@@ -195,14 +170,14 @@ inline bool vis_best(inlib::sg::gui_viewer& a_gv,
     if(empty) {
       delete sep;
     } else {
-      inlib::sg::separator& evt_sep = _evd->event_sg();
+      inlib::sg::separator& evt_sep = _evd->dynamic_sg();
       evt_sep.clear();
       evt_sep.add(sep);
 
       inlib::args opts;
-      opts.add(inlib::wall::s_placement(),inlib::wall::s_dynamic());
+      opts.add(inlib::sg::s_send_placement(),inlib::sg::s_placement_dynamic());
 
-      exlib::sg::view_wall* wc = exlib::sg::cast_view_wall(a_gv);
+      inlib::sg::view_sg_client* wc = inlib::sg::cast_view_sg_client(a_gv);
       if(wc) {if(!wc->send_sg(*sep,opts)){}}
     }
   
@@ -214,6 +189,7 @@ inline bool vis_best(inlib::sg::gui_viewer& a_gv,
 }
 
 #include "magfield"
+#include <inlib/sg/field_cut>
 #include <inlib/sg/colormap>
 
 namespace pmx {
@@ -316,6 +292,12 @@ protected:
   inlib::colorf m_col;
 };
 
+}
+
+#include "dac"
+
+namespace pmx {
+
 INLIB_GLOBAL_STRING(pmx_mag_grid)
 
 inline bool vis_magfield(inlib::sg::gui_viewer& a_gv) {
@@ -372,13 +354,8 @@ inline bool vis_magfield(inlib::sg::gui_viewer& a_gv) {
 */
   } 
 
-  if(!_evd->is_evd()) {
-    float scene_radius = 15000*0.5f;
-    _evd->create_sg_evd(scene_radius);
-  }
-
  {inlib::sg::separator* sep = new inlib::sg::separator;
-  _evd->detector_sg().add(sep);
+  _evd->static_sg().add(sep);
 
   inlib::sg::matrix* mtx = new inlib::sg::matrix;
   mtx->mtx.set_translate(0,0,5200);
@@ -395,12 +372,10 @@ inline bool vis_magfield(inlib::sg::gui_viewer& a_gv) {
   sep->add(node);
 
   inlib::args opts;
-  opts.add(inlib::wall::s_placement(),inlib::wall::s_static());
+  opts.add(inlib::sg::s_send_placement(),inlib::sg::s_placement_static());
 
-  exlib::sg::view_wall* wc = exlib::sg::cast_view_wall(a_gv);
+  inlib::sg::view_sg_client* wc = inlib::sg::cast_view_sg_client(a_gv);
   if(wc) {if(!wc->send_sg(*sep,opts)){}}}
-
-  a_gv.hide_main_menu();
 
   return true;
 }

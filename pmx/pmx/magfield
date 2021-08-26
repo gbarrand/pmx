@@ -9,14 +9,15 @@
 // From PANORAMIX_v21r5.
 // From LHCB_v35r3.
  
-#include <inlib/vec3d>
-#include <inlib/mat>
+#include <inlib/lina/vec3d>
+#include <inlib/lina/mat>
 #include <inlib/edep/units>
 #include <inlib/forit>
 #include <inlib/mnmx>
 #include <inlib/cstr>
 #include <inlib/S_STRING>
-#include <inlib/file>
+#include <inlib/file_read>
+#include <inlib/gzip>
 
 //
 #define PMX_HAS_ZLIB

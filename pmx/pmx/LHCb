@@ -1,10 +1,10 @@
 // Copyright (C) 2010, Guy Barrand. All rights reserved.
 // See the file pmx.license for terms.
 
-#ifndef pmx_pmx_LHCb
-#define pmx_pmx_LHCb
+#ifndef pmx_LHCb
+#define pmx_LHCb
 
-#include <inlib/vec3d>
+#include <inlib/lina/vec3d>
 #include <inlib/scast>
 #include <inlib/vmanip>
 #include <inlib/cid>
@@ -596,7 +596,8 @@ public:
   }
 public:
   KC_LHCb_Track(inlib::rroot::ifac& a_fac)
-  :m_fac(a_fac){
+  :m_fac(a_fac)
+  {
 #ifdef INLIB_MEM
     inlib::mem::increment(s_class().c_str());
 #endif
@@ -616,7 +617,9 @@ private:
     inlib::mem::increment(s_class().c_str());
 #endif
   }
-  KC_LHCb_Track& operator=(const KC_LHCb_Track&){return *this;}
+  KC_LHCb_Track& operator=(const KC_LHCb_Track& a_from){
+    return *this;
+  }
 public:
   const std::vector<LHCb_Track*>& tracks() const {return m_tracks;}
 private:

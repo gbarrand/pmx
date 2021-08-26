@@ -1,30 +1,39 @@
 // Copyright (C) 2010, Guy Barrand. All rights reserved.
 // See the file pmx.license for terms.
 
-#ifndef pmx_sg_dac
-#define pmx_sg_dac
+#ifndef pmx_dac
+#define pmx_dac
 
 //dac = data accessor
 
-#include <inlib/sg/gui_viewer>
+#include "magfield"
+#include "LHCb"
+
+#include <exlib/zlib>
+
 #include <inlib/rroot/file>
 #include <inlib/rroot/fac>
 #include <inlib/rroot/tree>
-
-#include "magfield"
+#include <inlib/rroot/tree_manip>
+#include <inlib/num2s>
 
 namespace pmx {
+
+INLIB_GLOBAL_STRING_VALUE(tree_best,_Event_Rec_Track_Best)
 
 class dac {
 public:
   INLIB_SCLASS(pmx::dac)
 public:
-  dac(inlib::sg::gui_viewer& a_gv)
-  :m_gv(a_gv)
+  dac(std::ostream& a_out)
+  :m__out(a_out)
   ,m_file(0)
   ,m_fac(0)
   ,m_tree(0)
+  ,m_be_seq(0)
+  ,m_event(0)
   ,m_grid(0)
+  ,m_event_index(0)
   {}
   virtual ~dac(){
     delete m_tree;
@@ -34,32 +43,130 @@ public:
   }
 protected:
   dac(const dac& a_from)
-  :m_gv(a_from.m_gv)
+  :m__out(a_from.m__out)
   ,m_file(0)
   ,m_fac(0)
   ,m_tree(0)
+  ,m_be_seq(0)
+  ,m_event(0)
   ,m_grid(0)
+  ,m_event_index(a_from.m_event_index)
   {}
-  dac& operator=(const dac& a_from){return *this;}
+  dac& operator=(const dac& a_from){
+    m_event_index = a_from.m_event_index;
+    return *this;
+  }
 public:
-  void reset_file() {
+  void reset_event_file() {
     delete m_tree;
     delete m_fac;
     delete m_file;
+    m_event = 0;
+    m_be_seq = 0;
     m_tree = 0;
     m_fac = 0;
     m_file = 0;  
+    m_event_index = 0;
   }
+
+  ///////////////////////////////////////////////////////////////
+  /// geometry : ////////////////////////////////////////////////
+  ///////////////////////////////////////////////////////////////
+  bool is_geometry_file(const std::string&)  {return false;}
+
+  bool open_geometry_file(const std::string& a_path,std::string& a_msg)  {
+    a_msg = "not a geometry file";
+    return false;
+  }
+  ///////////////////////////////////////////////////////////////
+  /// event : ///////////////////////////////////////////////////
+  ///////////////////////////////////////////////////////////////
+  bool is_event_file(const std::string&)  {return true;}
+
+  bool open_event_file(const std::string& a_path,std::string& a_msg) {
+    a_msg.clear();
+    reset_event_file();
+    bool verbose = false;
+    m_file = new inlib::rroot::file(m__out,a_path,verbose);
+    if(!m_file) {
+      a_msg = "can't open "+a_path;
+      return false;
+    }
+    m_file->add_unziper('Z',exlib::decompress_buffer);
+
+  //inlib::rroot::dump(m__out,*m_file,m_file->dir().keys(),true);
+
+    m_fac = new fac(m__out);
+
+    m_tree = inlib::rroot::find_tree(*m_file,*m_fac,s_tree_best(),true);      
+    if(!m_tree) {
+      reset_event_file();
+      a_msg = " tree "+s_tree_best()+" not found";
+      return false;
+    }
+    m_be_seq = inlib::rroot::find_be(*m_tree,"m_sequential"); //not owner
+    if(!m_be_seq) {
+      reset_event_file();
+      a_msg = "branch m_sequential not found";
+      return false;     
+    }
+   {std::string stmp;
+    if(!inlib::num2s((inlib::uint64)m_tree->entries(),stmp)){}
+    a_msg = stmp+" events";}
+    return true;
+  }
+
+  bool read_one_event(unsigned int a_index,std::string& a_msg,bool a_verbose) {
+    m_event = 0;
+    a_msg.clear();
+    if(!m_be_seq) {
+      a_msg = "m_sequential not found";
+      return false;
+    }
+    unsigned int n;
+    if(!m_be_seq->find_entry(*m_file,a_index,n)) {
+      a_msg = "find event failed";
+      return false;     
+    }
+    inlib::rroot::iro* o = m_be_seq->object();
+    m_event = inlib::safe_cast<inlib::rroot::iro,KC_LHCb_Track>(*o);
+    if(!m_event) {
+      a_msg = "object not a pmx::KC_LHCb_Track";
+      return false;     
+    }
+    m_event_index = a_index;
+    return true;
+  }
+  const KC_LHCb_Track* event() const {return m_event;}
+
+  inlib::uint64 number_of_events() const {
+    if(!m_tree) return 0;
+    return m_tree->entries();
+  }
+
+  bool has_events() const {return m_be_seq?true:false;}
+  
+  unsigned int event_index() const {return m_event_index;}
+  ///////////////////////////////////////////////////////////////
+  ///////////////////////////////////////////////////////////////
+  ///////////////////////////////////////////////////////////////
+  double event_time_min() const {return 0;}
+  double event_time_max() const {return 0;}
+
 public:
-  inlib::sg::gui_viewer& m_gv;
+  std::ostream& m__out;
   inlib::rroot::file* m_file;
   inlib::rroot::fac* m_fac;
   inlib::rroot::tree* m_tree;
+  inlib::rroot::branch_element* m_be_seq;
+  KC_LHCb_Track* m_event;
   magfield::field_grid* m_grid;
+  unsigned int m_event_index;
 };
 
-inline dac* cast_dac(inlib::sg::viewer& a_viewer) {
-  return inlib::safe_cast<inlib::sg::viewer,dac>(a_viewer);
+template <class VIEWER>
+inline dac* cast_dac(VIEWER& a_viewer) {
+  return inlib::safe_cast<VIEWER,dac>(a_viewer);
 }
 
 }
