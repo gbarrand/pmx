@@ -1,0 +1,9 @@
+
+#/bin/rm -f ./res/evt_3.bsg
+/bin/rm -f ./res/evt_0.bsg
+
+#/bin/rm -f ./res/evt_bu_2_jpsi_k_00011917_00000048_1_2.bsg
+/bin/rm -f ./res/evt_bu_2_jpsi_k_00011917_00000048_1_3.bsg
+
+/bin/rm -f ./res/evt_bs_mu_mu_2012_0.bsg
+#/bin/rm -f ./res/evt_bs_mu_mu_2012_3.bsg
