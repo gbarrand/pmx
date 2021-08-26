@@ -5,9 +5,9 @@
 
 #include <exlib/app/X11/main_cpp>
 
-int main(int argc,char** argv) {return exlib_main<pmx::context,pmx::main>("pmx",argc,argv);}
+int main(int argc,char** argv) {return exlib_main<pmx::main>("pmx",argc,argv);}
 
 //exlib_build_use inlib expat
 //exlib_build_use exlib png jpeg zlib inlib_glutess freetype
-//exlib_build_use GL GLX X11
+//exlib_build_use GLX X11
 
