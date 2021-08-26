@@ -24,6 +24,8 @@ import java.io.OutputStream;
 import java.io.File;
 import android.content.Intent;
 import android.net.Uri;
+import android.support.v4.content.FileProvider;
+//import androidx.core.content.FileProvider
 
 // for ACTION_VIEW :
 import android.content.ContentResolver;
@@ -129,17 +131,21 @@ public class Main extends NativeActivity {
              (ext.equals("wrl"))     || //for ioda built with CoinGL and HEPVis.
              (ext.equals("heprep"))  || //for ioda.
              (ext.equals("zheprep")) || //for ioda.
+             (ext.equals("shp"))     || //for ioda.
+             (ext.equals("shx"))     || //for ioda.
              (ext.equals("g4m"))     || //for MEMPHYS init.g4m
              (ext.equals("memphys")) || //for MEMPHYS input event file.
              (ext.equals("ttf"))     ||
              (ext.equals("otf"))     ||
              (ext.equals("jpg"))     ||
+             (ext.equals("jpeg"))    ||
              (ext.equals("png"))     ||
              (ext.equals("fog"))     ||
              (ext.equals("dot"))     ||
              (ext.equals("dcm"))     || //for DICOM
              (ext.equals("dic"))     || //for DICOM
              (ext.equals("fits"))    ||
+             (ext.equals("insh"))    ||
              (ext.equals("style"))   ||
              (ext.equals("ftp"))     ||
              (ext.equals("srv"))     ||
@@ -210,11 +216,19 @@ public class Main extends NativeActivity {
     intent.putExtra(Intent.EXTRA_TEXT,a_msg);
     intent.setType("message/rfc822");
     if(a_path.length()!=0) {
+    /*
       File file = new File(a_path);
       if(file.exists()) {
         intent.setType(a_mime);
         //Uri uri = Uri.fromFile(file);
         Uri uri = Uri.parse("file://" + file.getAbsolutePath());
+        intent.putExtra(Intent.EXTRA_STREAM,uri);
+      }
+      */      
+      File file = new File(a_path);
+      if(file.exists()) {
+        intent.setType(a_mime);
+        Uri uri = FileProvider.getUriForFile(this,"fr.in2p3.lal.pmx.provider",file);
         intent.putExtra(Intent.EXTRA_STREAM,uri);
       }
     }

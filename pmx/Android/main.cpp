@@ -10,7 +10,7 @@
 #include <exlib/app/Android/main_cpp>
 
 void android_main(struct android_app* a_state) {
-  exlib_main<pmx::context,pmx::main>("pmx","fr.in2p3.lal",a_state);
+  exlib_main<pmx::main>("pmx","fr.in2p3.lal",a_state);
 #ifdef EXLIB_ANDROID_MAIN_DO_STD_EXIT
   // for g4exa, g4view, ioda. Mainly all apps that need to unfold some zipped resource file.
   // If doing a first exit by using the Android back button, then

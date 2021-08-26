@@ -4,6 +4,10 @@ include $(CLEAR_VARS)
 
 LOCAL_MODULE := pmx
 
+INEXLIB_INC := ../../inexlib
+INEXLIB_SRC := ../../../inexlib
+OUREX_DIR := ../../../inexlib/ourex
+
 LOCAL_CFLAGS := \
  -DEXLIB_HAS_GL_VBO\
  -I../../inexlib/inlib\
@@ -168,6 +172,10 @@ ZLIB_SRC_FILES := \
  ../../../inexlib/ourex/zlib/source/uncompr.c\
  ../../../inexlib/ourex/zlib/source/zutil.c
 
+YACC_SRC_FILES := \
+  $(INEXLIB_SRC)/inlib/inlib/yacc/cexpr_lexer.cpp\
+  $(INEXLIB_SRC)/inlib/inlib/yacc/cexpr_eval.cpp
+
 LOCAL_SRC_FILES := \
  ../main.cpp\
  $(GLUTESS_SRC_FILES)\
@@ -175,6 +183,7 @@ LOCAL_SRC_FILES := \
  $(FREETYPE_SRC_FILES)\
  $(JPEG_SRC_FILES)\
  $(ZLIB_SRC_FILES)\
+ $(YACC_SRC_FILES)\
  $(PNG_SRC_FILES)\
  $(GL2PS_SRC_FILES)\
  $(CSZ_SRC_FILES)

@@ -9,5 +9,7 @@
 #APP_PLATFORM := android-9
 
 APP_STL := c++_static       # with ndk-r17.
-APP_PLATFORM := android-14  # android-ndk-r15b compells that. Android >= 4.0.1 (Ice Cream Sandwich).
+
+APP_PLATFORM := android-14 # for Nexus-10 (5.1.1).
+#APP_PLATFORM := android-26
 
