@@ -1,0 +1,43 @@
+#!insh
+
+cmd=gui_push_list
+
+cmd="${cmd} default       camera_default.insh\ndefault_geometry.insh\ngui_hide_main_menu"
+cmd="${cmd} 'setup 3D'    camera_setup_3d.insh\ngui_hide_main_menu"
+#cmd="${cmd} floor         neard_add_floor.insh\ngui_hide_main_menu"
+#cmd="${cmd} avatars       neard_add_avatars.insh\ngui_hide_main_menu"
+#cmd="${cmd} axes          neard_add_axes.insh\ngui_hide_main_menu"
+
+cmd="${cmd} 'beam pipe' 'scene_read_bsg -file=beam_pipe.bsg'\ngui_hide_main_menu"
+cmd="${cmd} velo        'scene_read_bsg -file=velo.bsg'\ngui_hide_main_menu"
+cmd="${cmd} it          'scene_read_bsg -file=it.bsg'\ngui_hide_main_menu"
+cmd="${cmd} rich1       'scene_read_bsg -file=rich1.bsg'\ngui_hide_main_menu"
+cmd="${cmd} tt          'scene_read_bsg -file=tt.bsg'\ngui_hide_main_menu"
+cmd="${cmd} magnet      'scene_read_bsg -file=magnet.bsg'\ngui_hide_main_menu"
+cmd="${cmd} ot          'scene_read_bsg -file=ot.bsg'\ngui_hide_main_menu"
+cmd="${cmd} rich2       'scene_read_bsg -file=rich2.bsg'\ngui_hide_main_menu"
+cmd="${cmd} spd         'scene_read_bsg -file=spd.bsg'\ngui_hide_main_menu"
+cmd="${cmd} prs         'scene_read_bsg -file=prs.bsg'\ngui_hide_main_menu"
+cmd="${cmd} ecal        'scene_read_bsg -file=ecal.bsg'\ngui_hide_main_menu"
+cmd="${cmd} hcal        'scene_read_bsg -file=hcal.bsg'\ngui_hide_main_menu"
+cmd="${cmd} muon        'scene_read_bsg -file=muon.bsg'\ngui_hide_main_menu"
+cmd="${cmd} floor       'scene_read_bsg -file=floor.bsg'\ngui_hide_main_menu"
+cmd="${cmd} infrastructure    'scene_read_bsg -file=infrastructure.bsg'\ngui_hide_main_menu"
+cmd="${cmd} infrastructure_wf 'scene_read_bsg -file=infrastructure_wf.bsg'\ngui_hide_main_menu"
+
+#/////////////////////////////
+#/// avatars ///////////////// 
+#/////////////////////////////
+cmd="${cmd} sarah    'scene_read_bsg -file=avatar_sarah.bsg'\ngui_hide_main_menu"
+#cmd="${cmd} computer 'scene_read_bsg -file=avatar_computer.bsg'\ngui_hide_main_menu"
+#cmd="${cmd} couch    'scene_read_bsg -file=avatar_couch.bsg'\ngui_hide_main_menu"
+#cmd="${cmd} plant    'scene_read_bsg -file=avatar_plant.bsg'\ngui_hide_main_menu"
+#cmd="${cmd} piano2   'scene_read_bsg -file=avatar_piano2.bsg'\ngui_hide_main_menu"
+#cmd="${cmd} dog      'scene_read_bsg -file=avatar_dog.bsg'\ngui_hide_main_menu"
+
+eval ${cmd}
+
+gui_show_main_menu
+
+unset cmd
+

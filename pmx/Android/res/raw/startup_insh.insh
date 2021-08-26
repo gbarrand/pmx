@@ -1,0 +1,8 @@
+#!insh
+
+scene_set_clear_color black
+
+scene_create -radius=7500
+
+camera_default.insh
+

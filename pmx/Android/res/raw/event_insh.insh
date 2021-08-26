@@ -1,0 +1,9 @@
+#!insh
+
+event_vis
+
+event_index=`event_index`
+gui_show_console "event index ${event_index}"
+
+unset event_index
+

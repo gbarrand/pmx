@@ -1,0 +1,69 @@
+#!insh
+
+rroot_open -managed_name=_lhcb `app_res_dir`/lhcbfull.root
+rroot_read -file=_lhcb Geometry  #read the TGeoManager Geometry object.
+
+#rroot_geo_print -geo=Geometry
+#rroot_geo_print -geo=Geometry MagnetCoil
+
+alias geo_vis='scene_add_rroot_geo_volume -geo=Geometry'
+
+geo_vis -modeling=solid -color=white -volume_depth=1 MagnetCoil
+
+lhcb_vds=`app_res_dir`/lhcb.vds
+
+items=`grep PipeSection ${lhcb_vds}`
+for item in ${items} ; do
+  s=`string_replace Pipe xxx ${item}`
+  if [ ${s} != ${item} ] ; then
+    #echo ${item}
+    geo_vis -modeling=solid -color=white -volume_depth=1 ${item}
+  fi
+done
+
+items=`grep VeloSensors ${lhcb_vds}`
+for item in ${items} ; do
+  s=`string_replace Velo xxx ${item}`
+  if [ ${s} != ${item} ] ; then
+    #echo ${item}
+    geo_vis -color=magenta -volume_depth=3 ${item}
+  fi
+done
+
+items=`grep Rich2lvRich2Mag ${lhcb_vds}`
+for item in ${items} ; do
+  s=`string_replace Rich xxx ${item}`
+  if [ ${s} != ${item} ] ; then
+    #echo ${item}
+    geo_vis -color=white -volume_depth=2 ${item}
+  fi
+done
+
+
+geo_vis -color=green -volume_depth=1 OTlvOTStation
+
+geo_vis -color=yellow -volume_depth=2 EcalInstallationOutSection
+geo_vis -color=yellow -volume_depth=2 EcalInstallationMidSection
+geo_vis -color=yellow -volume_depth=2 EcalInstallationInnSection
+
+geo_vis -color=cyan -volume_depth=1 MuonStatPoslvM1
+geo_vis -color=cyan -volume_depth=2 MuonStatPoslvM2
+geo_vis -color=cyan -volume_depth=2 MuonStatPoslvM3
+geo_vis -color=cyan -volume_depth=2 MuonStatPoslvM4
+geo_vis -color=cyan -volume_depth=2 MuonStatPoslvM5
+
+geo_vis -color=cyan -volume_depth=2 MuonStatPoslvM1Support
+geo_vis -color=cyan -volume_depth=3 MuonStatPoslvM2Support
+geo_vis -color=cyan -volume_depth=3 MuonStatPoslvM3Support
+geo_vis -color=cyan -volume_depth=3 MuonStatPoslvM4Support
+geo_vis -color=cyan -volume_depth=3 MuonStatPoslvM5Support
+
+geo_vis -color=cyan -volume_depth=3 MuonStatPoslvM1SupportPanel
+geo_vis -color=cyan -volume_depth=4 MuonStatPoslvM2SupportPanel
+geo_vis -color=cyan -volume_depth=4 MuonStatPoslvM3SupportPanel
+geo_vis -color=cyan -volume_depth=4 MuonStatPoslvM4SupportPanel
+geo_vis -color=cyan -volume_depth=4 MuonStatPoslvM5SupportPanel
+
+gui_hide_main_menu
+
+unalias geo_vis

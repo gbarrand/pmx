@@ -1,0 +1,69 @@
+#!insh
+
+cmd=gui_push_list_items
+
+cmd="${cmd} -item='detector:lhcb_side_256_128.jpg:gui_detector.insh'"
+
+cmd="${cmd} -item='mag field:white.jpg:vis_magnetic_field\ngui_hide_main_menu'"
+
+cmd="${cmd} -item='front:cam_lhcb_front.jpg:camera_front.insh\ngui_hide_main_menu'"
+cmd="${cmd} -item='side:cam_lhcb_side.jpg:camera_side.insh\ngui_hide_main_menu'"
+cmd="${cmd} -item='top:white.jpg:camera_top.insh\ngui_hide_main_menu'"
+cmd="${cmd} -item='3D:white.jpg:camera_3d.insh\ngui_hide_main_menu'"
+
+cmd="${cmd} -item='files:files.jpg:gui_menu_files'"
+
+if [ `gui_has_open_panel` = true ] ; then
+  cmd="${cmd} -item='open...:files.jpg:gui_open.insh'"
+fi
+    
+##ifdef EMSCRIPTEN
+##else
+#    if(m_ftps.size()) {
+#      inlib::sg::add_image_item(*this,*list,"ftp","location_ftp.jpg",inlib::ftp::action_ftp,inlib::ftp::pos_data(m_#ftps,false,0,0));
+#    }
+##endif
+
+cmd="${cmd} -item='next event:event.jpg:event_next\ngui_hide_main_menu'"
+
+#cmd="${cmd} -item='startup.insh:white.jpg:startup.insh'"
+
+cmd="${cmd} -item='vis events:vis_events.jpg:gui_vis_events.insh'"
+cmd="${cmd} -item='stop events:stop_events.jpg:event_stop_anim'"
+    
+cmd="${cmd} -item='anim:object_rotate_left.jpg:camera_start_anim move_rotate_around_focal_right\ngui_hide_main_menu'"
+cmd="${cmd} -item='clear event:clear_event.jpg:scene_clear_dynamic'"
+cmd="${cmd} -item='clear detector:clear_static.jpg:scene_clear_static'"
+cmd="${cmd} -item='reset:edit_undo.jpg:camera_reset\ngui_hide_main_menu'"
+
+# g4view:
+##ifdef EMSCRIPTEN
+##else
+#    //if(m_walls._walls().size()) {
+#    inlib::sg::add_image_item(*this,*list,inlib::sg::s_to_serv(),"connect_to_wall.jpg",inlib::cbk::action_sg_client_main);
+#    //}
+#    inlib::sg::add_white_item(*this,*list,inlib::sg::s_sg_serv(),inlib::cbk::action_sg_serv_main);
+##endif
+
+if [ `sys_os` = emscripten ] ; then
+  cmd="${cmd} -item='show terminal:white.jpg:gui_show_terminal'"
+  cmd="${cmd} -item='hide terminal:white.jpg:gui_hide_terminal'"
+fi
+
+cmd="${cmd} -item='export:document_export.jpg:gui_export.insh'"
+
+if [ `sys_os` = emscripten ] ; then
+  cmd="${cmd} -item='import:document_import.jpg:gui_import.insh'"
+fi
+
+cmd="${cmd} -item='utils:tools.jpg:gui_utils.insh'"
+
+cmd="${cmd} -item='about:icon.jpg:about.insh'"
+
+if [ `sys_device_has_stop_app_button` = false ] ; then
+  cmd="${cmd} -item='exit:application_exit.jpg:gui_set_to_exit'"
+fi
+
+eval ${cmd}
+
+unset cmd
