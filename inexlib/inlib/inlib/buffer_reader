@@ -44,8 +44,8 @@ public:
       *pos = c;pos++;m_pos++;
       if(c=='\n') {
         *pos = 0;
-        return true;        
-      }      
+        return true;
+      }
     }
     a_buff[len] = 0;
     return true;
