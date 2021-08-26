@@ -1,0 +1,8 @@
+#!insh
+
+camera_set_position -13000 6000 0
+
+camera_set_orientation -yxz -2.35 0.2 -0.2
+
+
+

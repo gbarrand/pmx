@@ -1,0 +1,6 @@
+#!insh
+
+# top with +z toward right and -y down :
+camera_set_position 0 5000 9000
+camera_set_orientation -1 -1 -1 2.094 # = 2*pi/3
+

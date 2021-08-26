@@ -1,0 +1,4 @@
+#!insh
+
+camera_set_position 0 0 20000
+camera_set_orientation 0 1 0 0

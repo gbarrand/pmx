@@ -1,0 +1,15 @@
+#!insh
+
+camera_set_ortho 15000
+
+camera_set_znear 1500
+camera_set_zfar 150000
+camera_set_focal 10000
+
+camera_set_dx 200
+camera_set_da 0.017  # one degree.
+camera_set_ds 0.99
+
+camera_set_position -10000 0 9000
+camera_set_orientation 0 1 0 -1.57
+
