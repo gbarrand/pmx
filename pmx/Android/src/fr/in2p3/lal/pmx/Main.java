@@ -52,7 +52,7 @@ public class Main extends NativeActivity {
         //Log.v("pmx::Main::onCreate","File intent : "+
         //      action+" : "+intent.getDataString()+" : "+intent.getType()+" : "+name);
         String document_path = "/sdcard/Android/data/fr.in2p3.lal.pmx/DOCUMENT";
-        uri_to_file(uri,document_path); 
+        uri_to_file(uri,document_path);
 
       } else if (scheme.compareTo(ContentResolver.SCHEME_CONTENT) == 0) {
         ContentResolver resolver = getContentResolver();
@@ -60,7 +60,7 @@ public class Main extends NativeActivity {
         //Log.v("pmx::Main::onCreate","Content intent : "+
         //      action+" : "+intent.getDataString()+" : "+intent.getType()+" : "+name);
         String document_path = "/sdcard/Android/data/fr.in2p3.lal.pmx/DOCUMENT";
-        uri_to_file(uri,document_path); 
+        uri_to_file(uri,document_path);
 
 /*
       } else if (scheme.compareTo("http") == 0) {
@@ -76,7 +76,7 @@ public class Main extends NativeActivity {
       }
     }
 
-    //System.err.println("debug : Main::onCreate : end");	
+    //System.err.println("debug : Main::onCreate : end");
   }
 
 
@@ -94,7 +94,7 @@ public class Main extends NativeActivity {
       try {
         String name = f.getName();
 
-        //NOTE : 
+        //NOTE :
         // if resource is xxx_ext then name is xxx_ext
         // if resource is xxx_yyy.ext then name is xxx_yyy
 
@@ -114,7 +114,7 @@ public class Main extends NativeActivity {
         int pos = name.lastIndexOf("_");
         if(pos!=(-1)) {
           String ext = name.substring(pos+1,name.length());
-          String fname = name.substring(0,pos);	
+          String fname = name.substring(0,pos);
 
         //System.out.println("debug : ext "+ext+" fname "+fname);
 
@@ -158,6 +158,7 @@ public class Main extends NativeActivity {
              (ext.equals("zip"))       ||
              (ext.equals("zvid"))      ||
              (ext.equals("scenarios")) ||
+             (ext.equals("gz"))        || //for TouchSky.
              (ext.equals("slides"))    ){
 
             if(ext.equals("fog")) {
@@ -197,7 +198,7 @@ public class Main extends NativeActivity {
       } catch(IOException e){
         System.out.println(e.getMessage());
       }
-    }      
+    }
   }
 
   public void send_mail(String a_to,
@@ -224,7 +225,7 @@ public class Main extends NativeActivity {
         Uri uri = Uri.parse("file://" + file.getAbsolutePath());
         intent.putExtra(Intent.EXTRA_STREAM,uri);
       }
-      */      
+      */
       File file = new File(a_path);
       if(file.exists()) {
         intent.setType(a_mime);
